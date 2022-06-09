@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import { CommonActions } from '@react-navigation/routers';
 import React, { Component } from 'react';
-import { View, Text, Image, TextInput, TouchableOpacity, TouchableWithoutFeedback, Keyboard, ImageBackground, KeyboardAvoidingView, Alert, FlatList, } from 'react-native';
+import { View, Text, Image, TextInput, TouchableOpacity, Switch, Keyboard, ImageBackground, KeyboardAvoidingView, Alert, FlatList, } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import RoundButton from '../Components/RoundButton';
 import TopHeader from '../Components/TopHeader';
@@ -24,8 +24,20 @@ export default class Settings extends Component {
             <View style={{ flex: 1, backgroundColor: Colors.boldBorderColor, }}
             >
                 <TopHeader
-                    title="WELCOME"
+                    title="Settings"
                 />
+
+                <View style={{ width: "100%", backgroundColor: Colors.boldBorderColor, flexDirection: "row" }}>
+                    <View style={{ flex: 1, flexDirection: "row" }}>
+                        <Text style={{ fontSize: wp(4) }}>SIM 1</Text>
+                        <Text style={{ fontSize: wp(4) }}> / </Text>
+                        <Text style={{ fontSize: wp(4) }}>SIM 2</Text>
+                    </View>
+
+                    <Switch />
+
+
+                </View>
 
                 
 

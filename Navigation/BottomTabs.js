@@ -1,4 +1,7 @@
 import React, {Component, useEffect, useRef} from 'react';
+import {
+  Image
+} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Colors} from '../constants';
 import {widthPercentageToDP as wp} from 'react-native-responsive-screen';
@@ -30,6 +33,12 @@ export default function MyTabs(props) {
         component={MessageScreen}
         options={{
           tabBarLabel: 'Message',
+          tabBarIcon: ({ focused, color, size }) => {
+            return <Image
+               style={{width:wp(9), height:wp(9), resizeMode:"contain", tintColor:color}}
+              source={require("../assets/message.png")}
+            />;
+          }
         }}
       />
       <Tab.Screen
@@ -37,6 +46,12 @@ export default function MyTabs(props) {
         component={HomeScreen}
         options={{
           tabBarLabel: 'GROUPS',
+          tabBarIcon: ({ focused, color, size }) => {
+            return <Image
+               style={{width:wp(9), height:wp(9), resizeMode:"contain", tintColor:color}}
+              source={require("../assets/group.png")}
+            />;
+          }
         }}
       />
       
@@ -45,6 +60,12 @@ export default function MyTabs(props) {
         component={Settings}
         options={{
           tabBarLabel: 'Settings',
+          tabBarIcon: ({ focused, color, size }) => {
+            return <Image
+               style={{width:wp(8), height:wp(8), resizeMode:"contain", tintColor:color}}
+              source={require("../assets/setting.png")}
+            />;
+          }
         }}
       />
     </Tab.Navigator>

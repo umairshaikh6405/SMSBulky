@@ -14,9 +14,11 @@
  } from 'react-native';
  import { SafeAreaView } from "react-native-safe-area-context";
  import MainNavigation from './Navigation/MainNavigation';
- import { Colors } from './constants';
+ import { Colors, ConstantsVar } from './constants';
  import LoadingView from './Components/LoadingView';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
+import FlashMessage from 'react-native-flash-message';
+import ConfirmationDailog from './Components/ConfirmationDailog';
  const WIDTH = Dimensions.get("window").width;
  const HEIGHT = Dimensions.get("window").height;
  
@@ -36,15 +38,18 @@ import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
    render() {
      return (
        <View style={{ flex: 1, backgroundColor: Colors.primary }}>
+          <FlashMessage position="top" />
          <SafeAreaView style={{ backgroundColor: Colors.primary, width: WIDTH, height: HEIGHT + StatusBar.currentHeight }}>
            <View style={{ backgroundColor: "white", flex: 1 }}>
                <View style={{ flex: 1 }}>
                  <StatusBar backgroundColor={Colors.primary} barStyle="light-content" />
                  <MainNavigation />
                  <LoadingView/>
+                 <ConfirmationDailog ref={(ref) => ConstantsVar.ConDailog = ref} />
                </View>
            </View>
          </SafeAreaView>
+        
        </View>
  
      )

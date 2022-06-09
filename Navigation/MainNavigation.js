@@ -64,6 +64,7 @@ const ScreenNavigator = () => {
         <Stack.Screen name="MyTabs"            component={MyTabs}         />  
         <Stack.Screen name="ImportListScreen"            component={ImportListScreen}         />  
         <Stack.Screen name="ContactsScreen"            component={ContactsScreen}         />  
+        <Stack.Screen name="SelectGroup"            component={HomeScreen}         />  
        
         
        </Stack.Navigator>

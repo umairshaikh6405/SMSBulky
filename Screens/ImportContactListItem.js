@@ -23,6 +23,8 @@ export default class ImportContactListItem extends Component {
   getSelected = () => {
     if (this.selected) {
       return this.item
+    }else{
+      return null
     }
   }
 

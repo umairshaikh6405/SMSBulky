@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import AsyncStorage from "@react-native-community/async-storage";
 import { Colors, ConstantsVar } from "../constants";
 import RNFetchBlob from "rn-fetch-blob";
+import { showMessage } from "react-native-flash-message";
 
 
 let backUP = {}
@@ -182,10 +183,18 @@ const ServerConnection = {
         }
     },
     showErrorMsg: (msg) => {
-        
+        showMessage({
+            message: msg,
+            color: "white",
+            backgroundColor: Colors.red
+          });
     },
     showSuccessMsg: (msg) => {
-       
+        showMessage({
+            message:msg,
+            color: "white",
+            backgroundColor: Colors.green
+          });
     }
 
 };

@@ -24,6 +24,9 @@ import DocumentPicker, {
     types,
 } from 'react-native-document-picker'
 import RNFetchBlob from 'rn-fetch-blob';
+import InputDailog from '../Components/InputDailog';
+import AsyncStorage from '@react-native-community/async-storage';
+
 
 
 let dataProvider = new DataProvider((r1, r2) => {
@@ -32,13 +35,17 @@ let dataProvider = new DataProvider((r1, r2) => {
 export default class ContactsScreen extends Component {
     constructor(props) {
         super(props);
+        this.backup = []
+        this.params = this.props.route.params
         this.isAll = true
-
+        this.selectedList = {}
         this.state = {
             selectedContacts: [],
             showcontactsdata: dataProvider.cloneWithRows([]),
             searchPlaceholder: 'Search',
-            searchText: "",
+            extendedState: {
+                ids: [] //array of ids
+            }
         };
 
 
@@ -57,22 +64,28 @@ export default class ContactsScreen extends Component {
     }
 
     async componentDidMount() {
-        this.loadContacts();
+        // this.loadContacts();
     }
     loadContacts() {
         this.setState({
-            showcontactsdata: dataProvider.cloneWithRows([{
-                displayName: "sdfsafsaf",
-                phoneNumber: "079897879878"
-            }]),
+            showcontactsdata: dataProvider.cloneWithRows([]),
             searchPlaceholder: `Search ${"0"} contacts`,
         });
     }
 
     handleSearch = (text) => {
-        this.setState({
-            searchText: text
-        })
+       
+        if(text != ""){
+           let filterL = this.backup.filter((item) => item.phoneNumber.includes(text) || item.displayName.includes(text) || (item.givenName && item.givenName.includes(text)))    
+           this.setState({
+            showcontactsdata:dataProvider.cloneWithRows(filterL)
+           })
+        }else{
+            this.setState({
+                showcontactsdata:dataProvider.cloneWithRows(this.backup)
+            })
+        }
+        
     };
 
     addContact = (list) => {
@@ -83,6 +96,7 @@ export default class ContactsScreen extends Component {
               uniqueContact.push({ ...obj })
             }
           });
+          this.backup = uniqueContact
         this.setState({
             showcontactsdata: dataProvider.cloneWithRows(uniqueContact),
             searchPlaceholder: `Search ${uniqueContact.length} contacts`,
@@ -109,16 +123,15 @@ export default class ContactsScreen extends Component {
 
     renderItem = (type, data, index) => {
         let item = data
-        if (this.state.searchText == "" && item.phoneNumber.includes(this.state.searchText) || item.displayName.includes(this.state.searchText) || item.givenName.includes(this.state.searchText)) {
-            return <ImportContactListItem
-                item={item}
-                index={index}
-                isAll={this.isAll}
-            />
-        } else {
-            return <View />
-        }
-
+        console.log("itemitemitemitemitemitemitemitem", item);
+        return <ImportContactListItem
+            ref={(ref) => {
+                this.selectedList[item.phoneNumber] = ref
+            }}
+            item={item}
+            index={index}
+            isAll={this.isAll}
+        />
     };
 
 
@@ -155,29 +168,28 @@ export default class ContactsScreen extends Component {
 
                         ifstream.onEnd(() => {
                             let list = []
-                            console.log("Sdfdsfdsf chunk", chunkData);
-                            if(chunkData.includes("\r\n")){
-                                list = chunkData.split("\r\n")
+                            if(chunkData.includes("\n")){
+                                list = chunkData.split("\n")
                             }else{
                                 list = chunkData.split("")
                             }
-                            
                             let csvList = []
                             list.forEach(element => {
                                 if (element != "") {
-                                    let iii = element.split("\t")
-                                    console.log("32423423",iii);
-                                    csvList.push({
-                                        displayName: iii[0],
-                                        phoneNumber: iii[1]
-                                    })
+                                    let iii = element.split(",")
+                                    let number = iii[1].replace('+92', '0');
+                                    number = number.replace( /^\D+/g, '')
+                                    if (number != "") {
+                                        csvList.push({
+                                            displayName: iii[0],
+                                            phoneNumber: number
+                                        })
+                                    }
                                 }
                             });
                             this.addContact(csvList)
                         });
                     });
-
-
             })
             .catch((error) => {
                 console.log("sdfdsfds", error);
@@ -256,7 +268,11 @@ export default class ContactsScreen extends Component {
                             style={{ width: wp(90), backgroundColor: Colors.secondary, borderRadius: 0 }}
                             textStyle={{ fontSize: wp(4) }}
                             onPress={() => {
-
+                                if(Object.keys(this.selectedList).length == 0){
+                                    ServerConnection.showErrorMsg("Please Select more than 1 number.")
+                                }else{
+                                     this.InputDailog.showDialog(true)
+                                }
                             }}
                         />
                     </View>
@@ -275,6 +291,44 @@ export default class ContactsScreen extends Component {
                             }
                             
                         }}
+                    />
+
+                    <InputDailog
+                    ref={(ref) => {
+                        this.InputDailog = ref
+
+                    }}
+                    onPress={async (name)=>{
+                        let savedGroups = await AsyncStorage.getItem("SavedGroups")
+                        savedGroups = savedGroups ? JSON.parse(savedGroups) : {}
+                        if (Object.hasOwnProperty.call(savedGroups, name)) {
+
+                            ServerConnection.showErrorMsg("Group name is already exist")
+
+                        }else {
+                            let selectedList = []
+                            for (const key in this.selectedList) {
+                                if (Object.hasOwnProperty.call(this.selectedList, key)) {
+                                    const element = this.selectedList[key];
+                                    if (element.getSelected()) {
+                                        selectedList.push(element.getSelected())
+                                    }
+                                }
+                            }
+                            
+                            if(selectedList.length == 0){
+                                ServerConnection.showErrorMsg("Please Select more than 1 number.")
+                                return
+                            }
+                            savedGroups[name] = selectedList
+                            await AsyncStorage.setItem("SavedGroups", JSON.stringify(savedGroups))
+                            this.InputDailog.showDialog(false)
+                            this.params.callBack()
+                            this.props.navigation.goBack()
+                            ServerConnection.showSuccessMsg("Group save successfully")
+                        }
+
+                    }}
                     />
                 </View>
             </SafeAreaView>

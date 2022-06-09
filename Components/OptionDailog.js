@@ -8,7 +8,7 @@ export default class OptionDailog extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      ShowDialog: false,
+      ShowDialog: true,
     };
   }
   showDialog = () => {
@@ -27,6 +27,16 @@ export default class OptionDailog extends Component {
         animationOut="slideOutRight"
         backdropOpacity={0.5}
         useNativeDriver={true}
+        onBackButtonPress={()=>{
+          this.setState({
+            ShowDialog: false,
+          });
+        }}
+        onBackdropPress={()=>{
+          this.setState({
+            ShowDialog: false,
+          });
+        }}
 
       >
         <View style={{ width: "90%", alignItems: "center" , backgroundColor:"white"}}>

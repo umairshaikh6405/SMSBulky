@@ -1,26 +1,34 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import { CommonActions } from '@react-navigation/routers';
 import React, { Component } from 'react';
-import { View, Text, Image, TextInput, TouchableOpacity, TouchableWithoutFeedback, Keyboard, ImageBackground, KeyboardAvoidingView, Alert, FlatList, } from 'react-native';
+import { View, Text, Image, TextInput, TouchableOpacity, FlatList, } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import RoundButton from '../Components/RoundButton';
 import TopHeader from '../Components/TopHeader';
 import { Colors, ConstStyles, Fonts, ServerConnection, ConstantsVar } from '../constants';
-import DocumentPicker, {
-    DirectoryPickerResponse,
-    DocumentPickerResponse,
-    isInProgress,
-    types,
-} from 'react-native-document-picker'
-import RNFetchBlob from 'rn-fetch-blob';
-import csv from 'csvtojson'
 
 export default class HomeScreen extends Component {
     constructor(props) {
         super(props);
+        this.params = this.props.route.params
+        this.selectable = this.params?.selectable
         this.state = {
-            groupList : []
+            groupList : {}
         };
+    }
+
+
+    componentDidMount(){
+        this.getGroups()
+    }
+
+
+
+    getGroups= async ()=>{
+        let savedGroups = await AsyncStorage.getItem("SavedGroups")
+        this.setState({
+            groupList : savedGroups ? JSON.parse(savedGroups) : {}
+        })
     }
 
 
@@ -32,7 +40,7 @@ export default class HomeScreen extends Component {
             <View style={{ flex: 1, backgroundColor: Colors.boldBorderColor, }}
             >
                 <TopHeader
-                    title="GROUPS"
+                    title={ this.selectable ? "SELECT GROUPS" : "GROUPS"}
                 />
 
                 <View style={{ width: wp(100), height: wp(15), flexDirection: "row", ...ConstStyles.shadow }}>
@@ -46,37 +54,80 @@ export default class HomeScreen extends Component {
 
                     />
 
-                    <RoundButton
+                   {!this.selectable && <RoundButton
                         title={"+"}
                         style={{ width: wp(18), backgroundColor: Colors.secondary, borderRadius: 0 }}
                         textStyle={{ fontSize: wp(8), marginTop: -wp(1.5) }}
                         onPress={() => {
-                            this.props.navigation.navigate("ImportListScreen")
+                            this.props.navigation.navigate("ImportListScreen",{
+                                callBack : this.getGroups
+                            })
                         }}
-                    />
+                    />}
 
                 </View>
 
 
                 <FlatList
                     style={{ flex: 1 }}
-                    data={groupList}
-                    renderItem={() => {
+                    data={Object.keys(groupList)}
+                    renderItem={({item, index}) => {
                         return (
-                            <View style={{
-                                width: wp(100), height: wp(20),
+                            <TouchableOpacity
+                            onPress={()=>{
+                                if (this.selectable) {
+                                    this.props.navigation.goBack()
+                                    this.params.callBack(groupList[item])
+                                } else {
+                                    let listData = "";
+                                    groupList[item].forEach(element => {
+                                        listData += `${element.displayName}: ${element.phoneNumber} \n`
+                                   });
+                                   alert(listData)
+                                }
+                            }}
+                            style={{
+                                width: wp(100), height: wp(17),
                                 backgroundColor: "white",
                                 ...ConstStyles.shadow,
                                 marginVertical: wp(2),
-                                justifyContent:"center"
+                                flexDirection:"row",
+                                justifyContent:"space-between",
+                                paddingHorizontal:wp(4),
+                                alignItems:"center"
                             }}>
 
-                                <Text>dsfsdfdsfs</Text>
+                                <Text style={{fontSize:wp(4) , color:"black"}}>{item} ({groupList[item].length})</Text>
+                               {!this.selectable && <TouchableOpacity
+                                onPress={()=>{
+                                    ConstantsVar.ConDailog.isVisible({
+                                        message: "Are you sure you, you want to delete?",
+                                        PosText: "Yes",
+                                        NegText: "No",
+                                        data:item,
+                                        PosPress: (data) => {
+                                            let iii = this.state.groupList
+                                            delete iii[data];
+                                            this.setState({
+                                                groupList : iii
+                                            })
+                                            AsyncStorage.setItem("SavedGroups",JSON.stringify(iii))
+                                        }
+                                    })
+                                }}
+                                >
+                                    <Image
+                                        style={{ width: wp(10), height: wp(10) }}
+                                        source={require("../assets/clock.png")}
+                                    />
+                                </TouchableOpacity>}
 
-                            </View>
+
+                            </TouchableOpacity>
                         )
                     }}
                 />
+                
 
             </View>
         );
