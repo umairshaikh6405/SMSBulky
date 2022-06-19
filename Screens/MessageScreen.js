@@ -63,7 +63,34 @@ export default class MessageScreen extends Component {
     }
 
 
-    sendSMS = (index) => {
+    sendSMS = async (index) => {
+        let SelectedSim = await AsyncStorage.getItem("SelectedSim")
+        SelectedSim = SelectedSim ? SelectedSim == "SIM-1" ? 0 : 1 : 0
+
+         
+            SmsAndroid.autoSend(
+                SelectedSim,
+                this.state.groupNumbers[index].phoneNumber,
+                this.state.messagetext,
+                (fail) => {
+                    alert("DSfsdfdsf 333" )
+                    this.setState({
+                        failList : [...this.state.failList, this.state.groupNumbers[index]] 
+                    })
+                    this.checkAndStop(index)
+                },
+                (success) => {
+                    this.setState({
+                        successList : [...this.state.successList, this.state.groupNumbers[index]] 
+                    })
+                    this.checkAndStop(index)
+                },
+              );
+        
+    }
+
+    checkAndStop = (index) => {
+        
         if (index == this.state.groupNumbers.length - 1) {
             this.UploadDailog.changeProgress(index+1)
             this.UploadDailog.done(()=>{
@@ -77,31 +104,12 @@ export default class MessageScreen extends Component {
             })
             ToastAndroid.show("Done", ToastAndroid.LONG)
            
-        } else {
-            // SmsAndroid.autoSend(
-            //     0,
-            //     this.state.groupNumbers[index].phoneNumber,
-            //     this.state.messagetext,
-            //     (fail) => {
-                    this.setState({
-                        failList : [...this.state.failList,this.state.groupNumbers[index]] 
-                    })
-                    setTimeout(() => {
-                        this.sendIndex += 1 
-                        this.UploadDailog.changeProgress(this.sendIndex)
-                        this.sendSMS(this.sendIndex)
-                    }, 5000);
-                // },
-                // (success) => {
-                    // this.setState({
-                    //     successList : [...this.state.successList,this.state.groupNumbers[index]] 
-                    // })
-                    // setTimeout(() => {
-                    //     this.sendIndex += 1 
-                    //     this.sendSMS(this.sendIndex)
-                    // }, 5000);
-            //     },
-            //   );
+        }else{
+            setTimeout(() => {
+                this.sendIndex += 1 
+                this.UploadDailog.changeProgress(this.sendIndex)
+                this.sendSMS(this.sendIndex)
+            }, 5000);
         }
     }
 
@@ -110,10 +118,10 @@ export default class MessageScreen extends Component {
         PermissionsAndroid.requestMultiple(
             [PermissionsAndroid.PERMISSIONS.READ_CONTACTS, PermissionsAndroid.PERMISSIONS.SEND_SMS, PermissionsAndroid.PERMISSIONS.READ_SMS],
             {
-                title: "Cool Photo App Camera Permission",
+                title: "READ_CONTACTS, SEND_SMS",
                 message:
-                    "Cool Photo App needs access to your camera " +
-                    "so you can take awesome pictures.",
+                    "We need these permission" +
+                    "so you can take usee this application",
                 buttonNeutral: "Ask Me Later",
                 buttonNegative: "Cancel",
                 buttonPositive: "OK"
@@ -161,7 +169,7 @@ export default class MessageScreen extends Component {
             <View style={{ flex: 1, backgroundColor: "white", alignItems: "center" }}
             >
                 <TopHeader
-                    title="WELCOME"
+                    title="Send Message"
                 />
 
               <View style={{width:"100%", flex:1, alignItems:"center",marginTop:wp(5) }}>

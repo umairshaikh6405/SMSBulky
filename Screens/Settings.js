@@ -12,8 +12,16 @@ export default class Settings extends Component {
     constructor(props) {
         super(props);
         this.state = {
-
+            SelectedSim : "SIM-1"
         };
+    }
+
+   async componentDidMount(){
+        let SelectedSim = await AsyncStorage.getItem("SelectedSim")
+        this.setState({
+            SelectedSim : SelectedSim ? SelectedSim  : "SIM-1"
+        })
+       
     }
 
 
@@ -29,18 +37,31 @@ export default class Settings extends Component {
 
                 <View style={{ width: "100%", backgroundColor: Colors.boldBorderColor, flexDirection: "row" }}>
                     <View style={{ flex: 1, flexDirection: "row" }}>
-                        <Text style={{ fontSize: wp(4) }}>SIM 1</Text>
+                        <Text style={{ fontSize: wp(4), color: this.state.SelectedSim == "SIM-1" ? Colors.primary : Colors.gray }}>SIM-1</Text>
                         <Text style={{ fontSize: wp(4) }}> / </Text>
-                        <Text style={{ fontSize: wp(4) }}>SIM 2</Text>
+                        <Text style={{ fontSize: wp(4) , color: this.state.SelectedSim == "SIM-2" ? Colors.primary : Colors.gray }}>SIM-2</Text>
                     </View>
 
-                    <Switch />
+                    <Switch
+                    value={this.state.SelectedSim != "SIM-1"}
+                        onChange={()=>{
+                            if(this.state.SelectedSim == "SIM-1"){
+                                AsyncStorage.setItem("SelectedSim", "SIM-2")
+                                this.setState({
+                                    SelectedSim : "SIM-2"
+                                })
+                            }else{
+                                AsyncStorage.setItem("SelectedSim", "SIM-1")
+                                this.setState({
+                                    SelectedSim : "SIM-1"
+                                })
+                            }
+                            
+                        }}
+                    />
 
 
                 </View>
-
-                
-
                 
 
             </View>

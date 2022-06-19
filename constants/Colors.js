@@ -1,7 +1,7 @@
 const blueVersion = {
 
-  primary: '#FF6C2F',
-  secondary: '#FFA500',
+  primary: '#244d70',
+  secondary: '#2d608c',
   lightblue:"#0690ce",
   gray: '#707070',
   lightGray: '#C1BCBC',

@@ -37,7 +37,7 @@ export default class SplashScreen extends Component {
             }}>
                 <Image
                     style={{ flex: 1, resizeMode: "contain" }}
-                    source={require("../assets/splash.jpeg")}
+                    source={require("../assets/splash.png")}
                 />
             </View>
         )

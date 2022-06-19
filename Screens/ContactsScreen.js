@@ -28,6 +28,7 @@ export default class ContactsScreen extends Component {
   constructor(props) {
     super(props);
     this.params = this.props.route.params
+    this.backuplist - []
     this.isAll = true
     this.ListRef = {}
     this.state = {
@@ -69,6 +70,7 @@ export default class ContactsScreen extends Component {
               uniqueContact.push({ ...obj })
             }
           });
+          this.backuplist = uniqueContact
           this.setState({
             showcontactsdata: dataProvider.cloneWithRows(uniqueContact),
             searchPlaceholder: `Search ${uniqueContact.length} contacts`,
@@ -83,9 +85,11 @@ export default class ContactsScreen extends Component {
   }
 
   handleSearch = (text) => {
-    this.setState({
-      searchText: text
-    })
+    
+   let searchList = this.backuplist.filter((item)=> item.phoneNumbers[0].number.toString().toLocaleLowerCase().includes(text.toString().toLocaleLowerCase()) || item.displayName.toString().toLocaleLowerCase().includes(text.toString().toLocaleLowerCase()) || item.givenName.toString().toLocaleLowerCase().includes(text.toString().toLocaleLowerCase()))
+   this.setState({
+    showcontactsdata : dataProvider.cloneWithRows(searchList)
+   })
   };
 
   contains = ({ displayName, phoneNumbers, givenName }, query) => {
@@ -110,7 +114,7 @@ export default class ContactsScreen extends Component {
 
   renderItem = (type, data, index) => {
     let item = data
-    if (this.state.searchText == "" && item.phoneNumbers[0].number.includes(this.state.searchText) || item.displayName.includes(this.state.searchText) || item.givenName.includes(this.state.searchText)) {
+    // if (this.state.searchText == "" && ) {
       return <ContactListItem
         ref={(ref)=>{
           this.ListRef[item.phoneNumbers[0].number] = ref
@@ -119,9 +123,9 @@ export default class ContactsScreen extends Component {
         index={index}
         isAll={this.isAll}
       />
-    } else {
-      return <View />
-    }
+    // } else {
+    //   return <View />
+    // }
 
   };
 
@@ -144,7 +148,7 @@ export default class ContactsScreen extends Component {
         }}>
         <View style={styles.container}>
           <TopHeader
-            title="WELCOME"
+            title="Contacts"
           />
           <View style={styles.mainContainer}>
             <View style={{ width: wp(100) }}>
@@ -190,7 +194,7 @@ export default class ContactsScreen extends Component {
                 for (const key in this.ListRef) {
                   if (Object.hasOwnProperty.call(this.ListRef, key)) {
                     const element = this.ListRef[key];
-                    let selecteditem = element.getSelected()
+                    let selecteditem = element?.getSelected()
                     if(selecteditem){
                       selectList.push(selecteditem)
                     }

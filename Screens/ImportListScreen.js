@@ -310,8 +310,8 @@ export default class ContactsScreen extends Component {
                             for (const key in this.selectedList) {
                                 if (Object.hasOwnProperty.call(this.selectedList, key)) {
                                     const element = this.selectedList[key];
-                                    if (element.getSelected()) {
-                                        selectedList.push(element.getSelected())
+                                    if (element?.getSelected()) {
+                                        selectedList.push(element?.getSelected())
                                     }
                                 }
                             }

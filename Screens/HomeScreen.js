@@ -118,7 +118,7 @@ export default class HomeScreen extends Component {
                                 >
                                     <Image
                                         style={{ width: wp(10), height: wp(10) }}
-                                        source={require("../assets/clock.png")}
+                                        source={require("../assets/Delete-Icon.png")}
                                     />
                                 </TouchableOpacity>}
 
